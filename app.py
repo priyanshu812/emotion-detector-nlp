@@ -1,6 +1,5 @@
 import streamlit as st
 import joblib
-import numpy as np
 import string
 import nltk
 from nltk.corpus import stopwords
@@ -8,6 +7,9 @@ from nltk.tokenize import word_tokenize
 # load models
 @st.cache_resource
 def load_models():
+    nltk.download('punkt', quiet=True)
+    nltk.download('punkt_tab', quiet=True)
+    nltk.download('stopwords', quiet=True)
     labels = joblib.load('emotion_labels.pkl')
     vector = joblib.load('tfidf_vectorizer.pkl')
     model = joblib.load('model_lr.pkl')
@@ -23,6 +25,7 @@ def preprocessing(text):
     tokens = [t for t in tokens if t not in stop_words]
     return ' '.join(tokens)
 
+emojes = {'joy': '😄', 'sadness': '😢', 'anger': '😠', 'fear': '😨', 'surprise': '😮', 'love': '❤️'}
 labels,vector,model = load_models()
 st.title('Emotions Detected')
 st.markdown('Enter the text and the emotions behind it will be predicted')
@@ -42,4 +45,12 @@ if clicked:
         for key , values in labels.items():
             new_dic[values]=key
         pred = new_dic[output_labeled]
-        st.markdown(f"The statement is {pred}")
+        emj = emojes[pred]  
+        st.markdown(f"The statement is {emj} {pred}")
+        prob = model.predict_proba(input_vector)[0]
+        prob_dict = {}
+        for index ,probability in enumerate(prob):
+            prob_dict[new_dic[index]] = probability
+        for key , probability in sorted(prob_dict.items(),key =lambda item:item[1],reverse = True):
+            st.markdown(f"**{key}{emojes[key]}:** {probability*100:.1f}%")
+            st.progress(probability)
