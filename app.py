@@ -32,11 +32,14 @@ user_input = st.text_area("", placeholder="e.g. I feel so hopeless today...", he
 
 clicked = st.button("Detect Emotion")
 if clicked:
-    preprocessed_input = preprocessing(user_input)
-    input_vector = vector.transform([preprocessed_input])
-    output_labeled = model.predict(input_vector)[0]
-    new_dic = {}
-    for key , values in labels.items():
-        new_dic[values]=key
-    pred = new_dic[output_labeled]
-    st.markdown(f"The statement is {pred}")
+    if not user_input :
+        st.warning("Please enter in the above box ⚠️")
+    else:
+        preprocessed_input = preprocessing(user_input)
+        input_vector = vector.transform([preprocessed_input])
+        output_labeled = model.predict(input_vector)[0]
+        new_dic = {}
+        for key , values in labels.items():
+            new_dic[values]=key
+        pred = new_dic[output_labeled]
+        st.markdown(f"The statement is {pred}")
