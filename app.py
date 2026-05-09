@@ -2,7 +2,6 @@ import streamlit as st
 import joblib
 import string
 import nltk
-import numpy as np 
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 # load models
